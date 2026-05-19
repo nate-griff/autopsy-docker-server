@@ -1,3 +1,10 @@
+---
+**⚠️ WARNING — Please Read Before Using**
+
+Just use a Windows Server instance and follow the instructions from [Autopsy](https://sleuthkit.org/autopsy/docs/user-docs/4.22.0/install_multiuser_page.html) since there are severe limitations to file paths, stability, and overall usability when hosting via Docker and/or Ubuntu. Autopsy is made for Windows, so just use Windows to host it.
+
+---
+
 # Autopsy multiuser "server"
 
 This respository contains all of the necessary files to run a multiuser server for Autopsy. 
