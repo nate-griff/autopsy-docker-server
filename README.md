@@ -16,6 +16,27 @@ This respository contains all of the necessary files to run a multiuser server f
 - If you previously started the stack before the PostgreSQL auth fix, recreate the volumes once with `docker compose down -v` before bringing it back up.
 - If you are deploying this onto a dedicated Linux server, you can keep the default Samba ports and enable the `samba` profile.
 
+## Memory tuning
+The Autopsy UI values are not persisted back into this Docker stack. To make memory changes stick across restarts, edit the `.env` file and recreate the affected services.
+
+- `SOLR_CONTAINER_MEMORY` controls the Solr container memory ceiling. If Autopsy keeps reporting a 4 GB maximum, this is the setting to raise.
+- `SOLR_JAVA_MEM` is passed directly to Solr as its JVM heap setting. Example: `-Xms2g -Xmx8g`
+- `ACTIVEMQ_CONTAINER_MEMORY` controls the ActiveMQ container memory ceiling.
+- `ACTIVEMQ_OPTS_MEMORY` is passed to the ActiveMQ JVM. Example: `-Xms512m -Xmx2g`
+- PostgreSQL is not JVM-based, so its memory and connection tuning must be handled separately from these JVM settings.
+
+After changing memory values in `.env`, rebuild and recreate the Java services:
+```bash
+docker compose up --build -d --force-recreate solr activemq
+```
+
+## LEAPP packages
+LEAPP modules are not a good fit for this Linux container stack if they depend on Windows binaries or Windows-only runtime components. In practice, treat them as unsupported here unless you have a separate Windows-side LEAPP workflow.
+
+If you need LEAPP, the safer assumption is:
+- run LEAPP-capable tooling on the Windows Autopsy client side, or
+- use a separate Windows host for that processing rather than trying to add it to these containers.
+
 ## Setup
 Upload the Autopsy Solr config set to ZooKeeper before creating cases in Autopsy:
 ```bash
@@ -64,4 +85,7 @@ Then, open Autopsy and go to `Tools (toolbar at the top) > Options > Multi-user`
 Replace the IP with your server ip/dns
 
 ## Credits
-Inspired by [this](https://github.com/CptOfEvilMinions/Autopsy-Automation/tree/main) and by this blog post [Getting started with Autopsy multi-user cluster](https://holdmybeersecurity.com/2021/05/11/getting-started-with-autopsy-multi-user-cluster/)
+Inspired by:
+- [CptOfEvilMinions/Autopsy-Automation](https://github.com/CptOfEvilMinions/Autopsy-Automation/tree/main)
+- [DACC4/autopsy-server](https://github.com/DACC4/autopsy-server)
+- [Getting started with Autopsy multi-user cluster](https://holdmybeersecurity.com/2021/05/11/getting-started-with-autopsy-multi-user-cluster/)

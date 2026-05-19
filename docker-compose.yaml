@@ -30,9 +30,10 @@ services:
       dockerfile: docker/Dockerfile-solr
       args:
         - SOLR_VERSION=${SOLR_VERSION}
-    environment: 
-      - ZK_HOST=zookeeper:2181
-      - SOLR_VERSION=${SOLR_VERSION}
+    environment:
+      ZK_HOST: zookeeper:2181
+      SOLR_VERSION: ${SOLR_VERSION}
+      SOLR_JAVA_MEM: ${SOLR_JAVA_MEM}
     networks:
       - default
       - autopsy-backend
@@ -43,7 +44,7 @@ services:
     depends_on: 
       - zookeeper
     cpus: 4
-    mem_limit: 4G
+    mem_limit: ${SOLR_CONTAINER_MEMORY}
 
   ######################################################## ActiveMQ ########################################################
   # http://sleuthkit.org/autopsy/docs/user-docs/4.18.0/install_activemq_page.html
@@ -60,11 +61,14 @@ services:
     networks:
       - default
       - autopsy-backend
+    environment:
+      ACTIVEMQ_OPTS_MEMORY: ${ACTIVEMQ_OPTS_MEMORY}
     ports:
       - "${SERVER_IP}:${ACTIVEMQ_HOST_PORT}:61616"
     volumes: 
       - activemq-config:/opt/activemq/conf
       - activemq-data:/opt/activemq/data
+    mem_limit: ${ACTIVEMQ_CONTAINER_MEMORY}
 
   ######################################################## Postgres ########################################################
   # http://sleuthkit.org/autopsy/docs/user-docs/4.18.0/install_postgresql_page.html

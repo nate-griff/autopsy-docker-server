@@ -12,3 +12,5 @@ COPY conf/docker/activemq/users.properties conf/users.properties
 # Set username and passowrd
 RUN sed -i "s/{{ AUTOPSY_USERNAME }}/${AUTOPSY_USERNAME}/g" conf/activemq.xml
 RUN sed -i "s/{{ AUTOPSY_PASSWORD }}/${AUTOPSY_PASSWORD}/g" conf/activemq.xml
+
+CMD ["/bin/sh", "-lc", "if [ -n \"${ACTIVEMQ_OPTS_MEMORY:-}\" ]; then export ACTIVEMQ_OPTS_MEMORY; export ACTIVEMQ_OPTS=\"${ACTIVEMQ_OPTS:-} ${ACTIVEMQ_OPTS_MEMORY}\"; fi; exec bin/activemq console"]
