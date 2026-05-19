@@ -1,4 +1,3 @@
-version: "2.2"
 services:
   ######################################################## Zookeeper ########################################################
   # http://sleuthkit.org/autopsy/docs/user-docs/4.18.0/install_solr_page.html
@@ -16,7 +15,7 @@ services:
       - default
       - autopsy-backend
     ports:
-      - "${SERVER_IP}:2181:2181"
+      - "${SERVER_IP}:${ZOOKEEPER_HOST_PORT}:2181"
     volumes:
       - zk-data:/data
       - zk-logs:/datalog
@@ -38,8 +37,7 @@ services:
       - default
       - autopsy-backend
     ports:
-      - "${SERVER_IP}:8983:8983"
-      - "${SERVER_IP}:9983:9983"
+      - "${SERVER_IP}:${SOLR_HOST_PORT}:8983"
     volumes:
       - solr-data:/var/solr
     depends_on: 
@@ -63,7 +61,7 @@ services:
       - default
       - autopsy-backend
     ports:
-      - "${SERVER_IP}:61616:61616"
+      - "${SERVER_IP}:${ACTIVEMQ_HOST_PORT}:61616"
     volumes: 
       - activemq-config:/opt/activemq/conf
       - activemq-data:/opt/activemq/data
@@ -88,12 +86,12 @@ services:
       - POSTGRES_DB=autopsy
       - POSTGRES_USER=${AUTOPSY_USERNAME}
       - POSTGRES_PASSWORD=${AUTOPSY_PASSWORD}
-      - POSTGRES_HOST_AUTH_METHOD="host all all all md5"
+      - POSTGRES_HOST_AUTH_METHOD=md5
     networks:
       - default
       - autopsy-backend
     ports:
-      - "${SERVER_IP}:5432:5432"
+      - "${SERVER_IP}:${POSTGRES_HOST_PORT}:5432"
     volumes:
       - pg-data:/var/lib/postgresql/data
   
@@ -101,16 +99,18 @@ services:
   samba:
     image: dockurr/samba
     container_name: 'autopsy-samba'
+    profiles:
+      - samba
     restart: unless-stopped
     environment:
       NAME: "Autopsy"
       USER: "${AUTOPSY_USERNAME}"
       PASS: "${AUTOPSY_PASSWORD}"
     ports:
-      - "${SERVER_IP}:137:137/udp" # required to advertise shares (NMBD)
-      - "${SERVER_IP}:138:138/udp" # required to advertise shares (NMBD)
-      - "${SERVER_IP}:139:139/tcp" # default smb port
-      - "${SERVER_IP}:445:445/tcp" # default smb port
+      - "${SERVER_IP}:${SAMBA_HOST_PORT_NMBD_137}:137/udp" # required to advertise shares (NMBD)
+      - "${SERVER_IP}:${SAMBA_HOST_PORT_NMBD_138}:138/udp" # required to advertise shares (NMBD)
+      - "${SERVER_IP}:${SAMBA_HOST_PORT_SMB_139}:139/tcp" # default smb port
+      - "${SERVER_IP}:${SAMBA_HOST_PORT_SMB_445}:445/tcp" # default smb port
     networks:
       - default
       - autopsy-backend
