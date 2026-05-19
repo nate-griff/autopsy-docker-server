@@ -84,6 +84,22 @@ Then, open Autopsy and go to `Tools (toolbar at the top) > Options > Multi-user`
 
 Replace the IP with your server ip/dns
 
+## Samba performance
+The Samba profile now uses an explicit `smb.conf` instead of the image defaults alone. The tuning is intentionally conservative:
+
+- `use sendfile = yes`
+- `min receivefile size = 16384`
+- `aio read size = 1`
+- `aio write size = 1`
+- `getwd cache = yes`
+
+This aims for better large-file throughput without overriding Linux socket autotuning or disabling locking semantics aggressively.
+
+If you update the Samba configuration, recreate that service:
+```bash
+docker compose --profile samba up -d --force-recreate samba
+```
+
 ## Credits
 Inspired by:
 - [CptOfEvilMinions/Autopsy-Automation](https://github.com/CptOfEvilMinions/Autopsy-Automation/tree/main)

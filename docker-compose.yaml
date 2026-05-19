@@ -107,7 +107,6 @@ services:
       - samba
     restart: unless-stopped
     environment:
-      NAME: "Autopsy"
       USER: "${AUTOPSY_USERNAME}"
       PASS: "${AUTOPSY_PASSWORD}"
     ports:
@@ -119,6 +118,7 @@ services:
       - default
       - autopsy-backend
     volumes:
+      - .\conf\docker\samba\smb.conf:/etc/samba/smb.conf:ro
       - samba-storage:/storage
 
 volumes:
